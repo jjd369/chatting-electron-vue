@@ -25,7 +25,7 @@ export default {
   methods: {
     leaveChatting() {
       this.$store.dispatch('User/logout', '')
-      this.$socket.emit('leave server')
+      // this.$socket.disconnect().connect()
       this.$router.push({ name: 'login' })
     },
   },

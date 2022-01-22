@@ -10,6 +10,13 @@
         placeholder="아이디를 입력해주세요."
         v-model="name"
       ></el-input>
+      <p>비밀번호를 입력해주세요.</p>
+      <el-input
+        class="input-login"
+        placeholder="비밀번호를 입력해주세요."
+        v-model="password"
+        show-password
+      ></el-input>
       <el-button @click="joinChatting()">로그인</el-button>
     </el-card>
   </div>
@@ -17,38 +24,29 @@
 
 <script>
 import { mapState } from 'vuex'
-
 export default {
-  sockets: {
-    connect: function () {
-      console.log('socket to notification channel connected')
-    },
-  },
   data() {
     return {
       name: '',
+      password: '',
     }
   },
   computed: {
     ...mapState('User', ['current_user']),
   },
   methods: {
-    joinChatting() {
+    async joinChatting() {
       if (!this.name) {
         return this.$message({
           type: 'info',
           message: '아이디를 입력해주세요.',
         })
       }
-
-      this.$socket.emit('join server', this.name)
-      this.$store.dispatch('User/login', this.name)
+      this.$store.dispatch('User/login', {
+        name: this.name,
+        password: this.password,
+      })
     },
-  },
-  mounted() {
-    this.$socket.on('new user', (allUsers) => {
-      this.$store.dispatch('User/callSetAllUsers', allUsers)
-    })
   },
 }
 </script>
