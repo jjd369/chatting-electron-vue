@@ -68,9 +68,11 @@ export default {
         return el.id === this.target_room_id
       })
     },
-    c_filter_message(){
-      return messages.filter((messages)=>{})
-    }
+    c_filter_message() {
+      return this.messages.filter((messages) => {
+        return messages
+      })
+    },
   },
   methods: {
     sendMessage() {
