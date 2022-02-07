@@ -27,7 +27,4 @@ export default {
 .side-bar-container {
   border-right: 1px solid #ebeef5;
 }
-.el-main {
-  padding: 20px 0;
-}
 </style>

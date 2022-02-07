@@ -39,22 +39,12 @@ const router = new VueRouter({
   mode: process.env.IS_ELECTRON ? 'hash' : 'history',
   base: process.env.BASE_URL,
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 500 }
+    }
+  }
 })
-
-// router.beforeEach((to, from, next) => {
-//   if (to.matched.some((record) => record.meta.requiresAuth)) {
-//     // 이 라우트는 인증이 필요하며 로그인 한 경우 확인하십시오.
-//     // 그렇지 않은 경우 로그인 페이지로 리디렉션하십시오.
-//     if (!store.state['User'].current_user) {
-//       next({
-//         path: '/login',
-//       })
-//     } else {
-//       next()
-//     }
-//   } else {
-//     next() // 반드시 next()를 호출하십시오!
-//   }
-// })
-
 export default router

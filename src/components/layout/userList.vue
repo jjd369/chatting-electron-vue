@@ -17,10 +17,12 @@
     <div
       class="currnet-user-wrap item"
       @contextmenu.prevent="
-        handleContextMenu({
+        callHandleMenu({
           top: `${$event.y}px`,
           left: `${$event.x}px`,
-          users: [current_user],
+          bool: true,
+          isGroup: false,
+          members: [current_user],
         })
       "
     >
@@ -34,10 +36,12 @@
         <div
           class="item"
           @contextmenu.prevent="
-            handleContextMenu({
+            callHandleMenu({
               top: `${$event.y}px`,
               left: `${$event.x}px`,
-              users: [user.name],
+              bool: true,
+              isGroup: false,
+              members: [current_user, user.name],
             })
           "
           :key="index"
@@ -47,39 +51,26 @@
         </div>
       </template>
     </div>
-    <CONTEXTMEUN type="userList" :room_members="room_members"></CONTEXTMEUN>
+    <CONTEXTMEUN type="userList"></CONTEXTMEUN>
   </div>
 </template>
 
 <script>
 import CONTEXTMEUN from '@/components/layout/contextMenu'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 export default {
   components: {
     CONTEXTMEUN,
   },
-  data() {
-    return {
-      room_members: [],
-    }
-  },
   computed: {
     ...mapState('User', ['all_users', 'current_user']),
     ...mapState('ContextMenu', ['handle_context_menu']),
-    ...mapState('Chat', ['target_room_id']),
     c_filter_all_users() {
       return this.all_users?.filter((user) => user.name !== this.current_user)
     },
   },
   methods: {
-    handleContextMenu({ top, left, users }) {
-      this.room_members = users
-      this.$store.dispatch('ContextMenu/callHandleMenu', {
-        top,
-        left,
-        bool: true,
-      })
-    },
+    ...mapActions('ContextMenu', ['callHandleMenu']),
   },
 }
 </script>
@@ -93,5 +84,8 @@ export default {
   background: #eee;
   padding: 20px;
   margin-right: 10px;
+}
+.user-list-wrap {
+  padding-top: 60px;
 }
 </style>

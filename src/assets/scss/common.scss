@@ -1,13 +1,12 @@
-@import './variables.scss';
 
 .item {
   display: flex;
   align-items: center;
   padding: 10px 20px;
   cursor: default;
-  &:hover {
-    background-color: #eee;
-  }
+  // &:hover {
+  //   background-color: #eee;
+  // }
   .balloon {
     background-color: #fff;
     position: relative;
@@ -68,6 +67,11 @@
   padding: 10px 20px;
   font-size: $font-medium;
   border-bottom: 1px solid #ebebeb;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  background: #fff;
+  z-index: 9999;
   .title {
     flex: 1;
   }

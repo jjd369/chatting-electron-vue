@@ -1,19 +1,37 @@
 import { getAllmessages } from '@/apis/message'
+
 const state = {
-  group: [],
   messages: {},
-  target_room_id: '',
+  target_members: [],
+  is_group: false,
+}
+
+const getters = {
+  getLastMessageById: (state) => (id) => {
+    const find_message_by_id = state.messages.find((el) => el._id === id)
+    return find_message_by_id.messages[find_message_by_id.messages.length - 1]?.content
+  },
+  getMessageById: (state, getters) => {
+    return state.messages.find((el) => el._id === getters.getIdByMembers)?.messages
+  },
+  getIdByMembers: (state) => {
+    return state.messages.find((el) => {
+      let condition_array = []
+      state.target_members.forEach((member) => {
+        el.members.includes(member) ? (condition_array.push(1)) : (condition_array.push(0))
+      })
+      return condition_array.every((el) => el === 1)
+    })?._id
+  },
+  getExceptCurrentUser: (state, getters, rootState) => {
+    return state.target_members.filter((el) => el !== rootState.User.current_user)
+  },
 }
 
 const mutations = {
-  SET_MESSAGES(state, newVal) {
-    state.message_obj[state.target_room_id] = [...newVal]
-  },
-  SET_NEW_MESSAGE(state, { chatName, content, sender }) {
-    state.message_obj[chatName].push({ content, sender })
-  },
-  SET_ROOM_ID(state, newVal) {
-    state.target_room_id = newVal
+  SET_NEW_MESSAGE(state, { message, chatId }) {
+    const find_index = state.messages.findIndex((el) => el._id === chatId)
+    state.messages[find_index].messages.push(message)
   },
   SET_ALL_MESSAGES(state, newVal) {
     state.messages = newVal
@@ -21,17 +39,9 @@ const mutations = {
 }
 
 const actions = {
-  callSetMeesages({ commit }, newVal) {
-    commit('SET_MESSAGES', newVal)
-  },
-  callSetRoomId({ commit }, newVal) {
-    commit('SET_ROOM_ID', newVal)
-  },
   callSetNewMessage({ commit }, newVal) {
+    console.log(newVal)
     commit('SET_NEW_MESSAGE', newVal)
-  },
-  callSetAllMessage({ commit }, newVal) {
-    commit('SET_ALL_MESSAGE', newVal)
   },
   async fetchAllMessages({ commit }, name) {
     const { data } = await getAllmessages({ name })
@@ -42,6 +52,7 @@ const actions = {
 export default {
   state,
   mutations,
+  getters,
   actions,
   namespaced: true,
 }

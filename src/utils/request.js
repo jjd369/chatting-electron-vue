@@ -1,5 +1,8 @@
 import axios from 'axios'
-import { getAccessToken } from '@/utils/token'
+import { getAccessToken, getRefreshToken, setAccessToken } from '@/utils/token'
+import { refreshToken } from '@/apis/auth'
+import store from '@/store'
+
 const instance = axios.create({
   baseURL: 'http://localhost:3333/',
   timeout: 10000,
@@ -22,13 +25,24 @@ instance.interceptors.request.use(
 // Add a response interceptor
 instance.interceptors.response.use(
   function (response) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
     return response
   },
-  function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
+  async function (error) {
+    if (
+      error.config &&
+      error.response &&
+      error.response.status === 401 &&
+      !error.config.retry
+    ) {
+      error.config.retry = true
+      const { data } = await refreshToken({ token: getRefreshToken() })
+      setAccessToken(data.accessToken)
+
+      return instance.request(error.config)
+    }
+    if (error.config && error.response && error.response.status === 403) {
+      store.dispatch('User/logout')
+    }
     return Promise.reject(error)
   }
 )

@@ -1,13 +1,13 @@
 import router from '@/router'
 import { login, logout } from '@/apis/auth'
-import { getRefreshToken } from '@/utils/token'
-import Cookies from 'js-cookie'
+import { getRefreshToken, setAccessToken, setRefreshToken, removeAccessToken, removeRefreshToken } from '@/utils/token'
 import { Message } from 'element-ui'
 import { getAllUSer } from '@/apis/user'
 
 const state = {
   current_user: '',
   all_users: [],
+  login_users: [],
 }
 
 const mutations = {
@@ -17,6 +17,9 @@ const mutations = {
   SET_ALL_USERS(state, newVal) {
     state.all_users = newVal
   },
+  SET_LOGIN_USER(state, newVal) {
+    state.login_users = newVal
+  },
 }
 
 const actions = {
@@ -25,14 +28,17 @@ const actions = {
       const { name, password } = newVal
       const { data } = await login({ name, password })
 
-      Cookies.set('accessToken', data.accessToken)
-      Cookies.set('refreshToken', data.refreshToken)
+      setAccessToken(data.accessToken)
+      setRefreshToken(data.refreshToken)
+
       commit('SET_NAME', name)
 
-      await dispatch('fetchUsers')
-      await dispatch('Chat/fetchAllMessages', name, { root: true })
+      Promise.all([
+        await dispatch('fetchUsers'),
+        await dispatch('Chat/fetchAllMessages', name, { root: true }),
+      ])
 
-      router.push({ name: 'userList' }).catch(() => {})
+      router.push({ name: 'userList' }).catch()
     } catch (e) {
       Message({
         message: e.response.data,
@@ -43,12 +49,15 @@ const actions = {
   async logout({ commit, state }) {
     await logout({ token: getRefreshToken(), name: state.current_user })
     commit('SET_NAME', '')
-    Cookies.remove('accessToken')
-    Cookies.remove('refreshToken')
+    removeAccessToken()
+    removeRefreshToken()
   },
   async fetchUsers({ commit }) {
     const { data } = await getAllUSer()
     commit('SET_ALL_USERS', data)
+  },
+  setLoginUser({ commit }, arr) {
+    commit('SET_LOGIN_USER', arr)
   },
 }
 

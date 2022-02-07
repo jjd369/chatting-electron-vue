@@ -20,17 +20,10 @@ export default {
   methods: {
     getAccessToken,
   },
-  created() {
-    // window.addEventListener('beforeunload', function () {
-    //   console.log('test')
-    //   socket.removeAllListeners()
-    // })
-  },
   mounted() {
     socket.connection()
     socket.subscribeMessage()
     socket.subscribeUser()
-    console.log(socket.getSocket())
   },
   beforeDestroy() {
     socket.removeAllListeners()
@@ -38,3 +31,8 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+#app {
+  background: #fff;
+}
+</style>

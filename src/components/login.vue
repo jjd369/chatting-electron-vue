@@ -17,7 +17,9 @@
         v-model="password"
         show-password
       ></el-input>
-      <el-button @click="joinChatting()">로그인</el-button>
+      <el-button @click="joinChatting()" :disabled="login_button"
+        >로그인</el-button
+      >
     </el-card>
   </div>
 </template>
@@ -29,6 +31,7 @@ export default {
     return {
       name: '',
       password: '',
+      login_button: false,
     }
   },
   computed: {
@@ -36,16 +39,19 @@ export default {
   },
   methods: {
     async joinChatting() {
+      console.log('count')
+      this.login_button = true
       if (!this.name) {
         return this.$message({
           type: 'info',
           message: '아이디를 입력해주세요.',
         })
       }
-      this.$store.dispatch('User/login', {
+      await this.$store.dispatch('User/login', {
         name: this.name,
         password: this.password,
       })
+      this.login_button = false
     },
   },
 }

@@ -9,10 +9,7 @@
   >
     <ul v-if="type === 'userList'">
       <li class="item">프로필 보기</li>
-      <li v-if="!c_check_current_user" class="item" @click="joinChat"
-        >채팅하기</li
-      >
-      <li v-else class="item" @click="joinChat">나와의 채팅</li>
+      <li class="item" @click="joinChat">채팅하기</li>
     </ul>
     <ul v-if="type === 'chatList'">
       <li class="item" @click="joinChat">채팅방 열기</li>
@@ -24,19 +21,14 @@
 
 <script>
 import { mapState } from 'vuex'
-// import { joinChat } from '@/utils/socket'
 export default {
   props: {
     type: [String],
-    room_members: [Array],
   },
   computed: {
     ...mapState('User', ['current_user']),
     ...mapState('ContextMenu', ['handle_context_menu', 'position']),
     ...mapState('Chat', ['target_room_id']),
-    c_check_current_user() {
-      return this.room_members.find((el) => el === this.current_user)
-    },
   },
   watch: {
     handle_context_menu(newVal) {
@@ -52,12 +44,12 @@ export default {
       })
     },
     closeMenu() {
-      this.$store.dispatch('ContextMenu/callHandleMenu', { bool: false })
+      this.$store.dispatch('ContextMenu/callCloseMenu')
     },
     joinChat() {
       this.$router.push({
         name: 'chat',
-        query: { room_members: this.room_members },
+        query: { to: this.to, isGroup: this.isGroup },
       })
     },
   },

@@ -14,55 +14,44 @@
       ></div>
     </div>
     <div class="message-list-wrap">
-      <template v-for="(message, key) in messages">
+      <template v-for="(room, key) in messages">
         <div
           class="item"
           @contextmenu.prevent="
-            handleContextMenu({
+            callHandleMenu({
               top: `${$event.y}px`,
               left: `${$event.x}px`,
-              users: message.members,
+              bool: true,
+              members: room.members,
+              isGroup: room.isGroup,
             })
           "
           :key="key"
         >
           <span class="user-img-wrap"><i class="el-icon-user-solid"></i></span>
           <div class="chat-room">
-            <span>{{ getSender(message.members) }}</span>
-            <span>{{ getLastMessage(message.messages) }}</span>
+            <span>{{ getSender(room.members) }}</span>
+            <span>{{ getLastMessageById(room._id) }}</span>
           </div>
         </div>
       </template>
     </div>
-    <CONTEXTMEUN type="chatList" :room_members="room_members"></CONTEXTMEUN>
+    <CONTEXTMEUN type="chatList"></CONTEXTMEUN>
   </div>
 </template>
 
 <script>
 import CONTEXTMEUN from '@/components/layout/contextMenu'
-import { mapState } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 export default {
   components: { CONTEXTMEUN },
-  data() {
-    return {
-      target_room: '',
-      room_members: [],
-    }
-  },
   computed: {
-    ...mapState('Chat', ['group', 'target_room_id', 'messages']),
+    ...mapState('Chat', ['messages']),
     ...mapState('User', ['current_user']),
+    ...mapGetters('Chat', ['getLastMessageById']),
   },
   methods: {
-    handleContextMenu({ top, left, users }) {
-      this.room_members = [...users]
-      // this.$store.dispatch('Chat/callSetRoomId', room)
-      this.$store.dispatch('ContextMenu/callHandleMenu', {
-        top,
-        left,
-        bool: true,
-      })
-    },
+    ...mapActions('ContextMenu', ['callHandleMenu']),
     getSender(members) {
       const sender = members.filter((el) => el !== this.current_user)
       return sender.toString()
@@ -85,5 +74,8 @@ export default {
       padding-bottom: 4px;
     }
   }
+}
+.message-list-wrap {
+  padding-top: 60px;
 }
 </style>
